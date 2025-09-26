@@ -110,7 +110,7 @@
             <div class=" text-sm p-2 space-y-4 bg-base-200/30 rounded">
 
                 {% for espacio in reserva.espacios.all %}
-                <div class="flex justify-between bg-base-300 py-6 px-4  rounded">
+                <div class="flex justify-between bg-base-200 py-6 px-4  rounded">
                     <span class="font-medium">{{ espacio.nombre }}</span>
                     <div class="flex items-center gap-2">
                         <div class="badge badge-primary badge-sm">{{ espacio.get_tipo_display }}</div>
@@ -132,117 +132,7 @@
         </div>
     </div>
 
-    {% if reserva.modalidad == 'presencial' or reserva.modalidad == 'mixta' %}
-    <!-- Requerimientos -->
-    <div class="card bg-base-100 shadow-sm border border-base-200 p-4">
-        <h2 class="text-base font-medium mb-3 flex items-center gap-2">
-            <i class="fas fa-cogs text-info"></i>
-            Requerimientos
-        </h2>
 
-        <!-- Técnicos -->
-        <div class="mb-4">
-            <h3 class="text-sm font-medium text-base-content/80 mb-2 flex items-center gap-2">
-                <i class="fas fa-laptop text-primary text-xs"></i>
-                Técnicos
-            </h3>
-            <div class="grid grid-cols-3 gap-2 text-xs">
-                <div class="flex justify-between p-2 bg-base-200/30 rounded">
-                    <span>Proyector</span>
-                    <div class="badge badge-success badge-xs">2</div>
-                </div>
-                <div class="flex justify-between p-2 bg-base-200/30 rounded">
-                    <span>Pantallas</span>
-                    <div class="badge badge-success badge-xs">1</div>
-                </div>
-                <div class="flex justify-between p-2 bg-base-200/30 rounded">
-                    <span>Sonido</span>
-                    <div class="badge badge-success badge-xs">Sí</div>
-                </div>
-                <div class="flex justify-between p-2 bg-base-200/30 rounded">
-                    <span>WiFi</span>
-                    <div class="badge badge-success badge-xs">Sí</div>
-                </div>
-                <div class="flex justify-between p-2 bg-base-200/30 rounded">
-                    <span>Micrófono</span>
-                    <div class="badge badge-ghost badge-xs">No</div>
-                </div>
-                <div class="flex justify-between p-2 bg-base-200/30 rounded">
-                    <span>Computadoras</span>
-                    <div class="badge badge-ghost badge-xs">No</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Materiales -->
-        <div class="mb-4">
-            <h3 class="text-sm font-medium text-base-content/80 mb-2 flex items-center gap-2">
-                <i class="fas fa-chair text-secondary text-xs"></i>
-                Materiales
-            </h3>
-            <div class="grid grid-cols-4 gap-2 text-xs">
-                <div class="flex justify-between p-2 bg-base-200/30 rounded">
-                    <span>Mesas</span>
-                    <div class="badge badge-success badge-xs">3</div>
-                </div>
-                <div class="flex justify-between p-2 bg-base-200/30 rounded">
-                    <span>Sillas</span>
-                    <div class="badge badge-success badge-xs">15</div>
-                </div>
-                <div class="flex justify-between p-2 bg-base-200/30 rounded">
-                    <span>Pizarras</span>
-                    <div class="badge badge-ghost badge-xs">No</div>
-                </div>
-                <div class="flex justify-between p-2 bg-base-200/30 rounded">
-                    <span>Atriles</span>
-                    <div class="badge badge-ghost badge-xs">No</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Servicios -->
-        <div>
-            <h3 class="text-sm font-medium text-base-content/80 mb-2 flex items-center gap-2">
-                <i class="fas fa-concierge-bell text-accent text-xs"></i>
-                Servicios Adicionales
-            </h3>
-            <div class="space-y-2">
-                <div class="alert alert-info/50 py-2">
-                    <i class="fas fa-coffee"></i>
-                    <div class="flex-1">
-                        <span class="font-medium text-sm">Catering</span>
-                        <div class="text-xs text-base-content/70">Coffee break, agua, pastelería</div>
-                    </div>
-                    <div class="badge badge-info">15 personas</div>
-                </div>
-                <div class="alert alert-info py-2">
-                    <i class="fas fa-users"></i>
-                    <div class="flex-1">
-                        <span class="font-medium text-sm">Personal de Apoyo</span>
-                        <div class="text-xs text-base-content/70">Asistente técnico, moderador</div>
-                    </div>
-                    <div class="badge badge-info">Solicitado</div>
-                </div>
-                <div class="alert alert-warning py-2">
-                    <i class="fas fa-shield-alt"></i>
-                    <div class="flex-1">
-                        <span class="font-medium text-sm">Nivel de Seguridad</span>
-                    </div>
-                    <div class="badge badge-warning">Alto</div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    {% endif %} 
-
-    {% if reserva.modalidad == 'virtual' or reserva.modalidad == 'mixta' %}
-
-    <div>
-        Todo
-    </div>
-
-    {% endif %} 
     <!-- Estado y Observaciones -->
     <div class="grid grid-cols-2 gap-4">
         <div class="card bg-base-100 shadow-sm border border-base-200  space-y-2 p-4">
@@ -301,6 +191,163 @@
         {% endif %}
 
     </div>
+
+
+    {% if reserva.modalidad == 'virtual' or reserva.modalidad == 'mixta' %}
+    <div class="collapse collapse-arrow bg-base-100 border border-base-300 rounded-lg shadow-sm">
+      <input type="radio" name="my-accordion-2" />
+      <div class="collapse-title font-semibold text-base-content/80 px-4 py-2">
+        Ver más detalles de la reserva virtual
+      </div>
+      <div class="collapse-content p-4 space-y-4">
+    
+        {% for re in reserva.reserva_espacios.all %}
+          {% if re.detalle_digital %}
+          <div class="card bg-base-100 shadow-sm border border-base-200 p-4">
+            <h3 class="text-sm font-medium mb-2">{{ re.espacio.nombre }} (Virtual)</h3>
+            <div class="grid grid-cols-2 gap-2 text-xs text-base-content/70">
+              <div class="flex justify-between">
+                <span>Anfitrión:</span>
+                <span class="font-medium">{{ re.detalle_digital.anfitrion_usuario|default:"N/A" }}</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Ubicación transmisión:</span>
+                <span class="font-medium">{{ re.detalle_digital.ubicacion_transmision|default:"N/A" }}</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Espacio transmisión:</span>
+                <span class="font-medium">{{ re.detalle_digital.espacio_transmision|default:"N/A" }}</span>
+              </div>
+              <div class="flex justify-between">
+                <span>URL:</span>
+                {% if re.detalle_digital.url %}
+                  <a href="{{ re.detalle_digital.url }}" target="_blank" class="font-medium text-blue-500 hover:underline truncate">{{ re.detalle_digital.url|truncatechars:30 }}</a>
+                {% else %}
+                  <span class="font-medium">N/A</span>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+          {% endif %}
+        {% empty %}
+          <p class="text-xs text-base-content/60">No hay detalles digitales asociados.</p>
+        {% endfor %}
+    
+      </div>
+    </div>
+    {% endif %}
+    
+  
+    {% if reserva.modalidad == 'presencial' or reserva.modalidad == 'mixta' %}
+    <div class="collapse collapse-arrow bg-base-100 border border-base-300 ">
+        <input type="radio" name="my-accordion-2"  />
+        <div class="collapse-title font-semibold">Ver requerimientos extras, click para expandir</div>
+        
+        <!-- Requerimientos -->
+        <div class="collapse-content card bg-base-100 shadow-sm border border-base-200 ">
+            <h2 class="text-base font-medium mb-3 flex items-center gap-2">
+                <i class="fas fa-cogs text-info"></i>
+                Requerimientos
+            </h2>
+
+            <!-- Técnicos -->
+            <div class="mb-4">
+                <h3 class="text-sm font-medium text-base-content/80 mb-2 flex items-center gap-2">
+                    <i class="fas fa-laptop text-primary text-xs"></i>
+                    Técnicos
+                </h3>
+                <div class="grid grid-cols-3 gap-2 text-xs">
+                    <div class="flex justify-between p-2 bg-base-200/30 rounded">
+                        <span>Proyector</span>
+                        <div class="badge badge-success badge-xs">2</div>
+                    </div>
+                    <div class="flex justify-between p-2 bg-base-200/30 rounded">
+                        <span>Pantallas</span>
+                        <div class="badge badge-success badge-xs">1</div>
+                    </div>
+                    <div class="flex justify-between p-2 bg-base-200/30 rounded">
+                        <span>Sonido</span>
+                        <div class="badge badge-success badge-xs">Sí</div>
+                    </div>
+                    <div class="flex justify-between p-2 bg-base-200/30 rounded">
+                        <span>WiFi</span>
+                        <div class="badge badge-success badge-xs">Sí</div>
+                    </div>
+                    <div class="flex justify-between p-2 bg-base-200/30 rounded">
+                        <span>Micrófono</span>
+                        <div class="badge badge-ghost badge-xs">No</div>
+                    </div>
+                    <div class="flex justify-between p-2 bg-base-200/30 rounded">
+                        <span>Computadoras</span>
+                        <div class="badge badge-ghost badge-xs">No</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Materiales -->
+            <div class="mb-4">
+                <h3 class="text-sm font-medium text-base-content/80 mb-2 flex items-center gap-2">
+                    <i class="fas fa-chair text-secondary text-xs"></i>
+                    Materiales
+                </h3>
+                <div class="grid grid-cols-4 gap-2 text-xs">
+                    <div class="flex justify-between p-2 bg-base-200/30 rounded">
+                        <span>Mesas</span>
+                        <div class="badge badge-success badge-xs">3</div>
+                    </div>
+                    <div class="flex justify-between p-2 bg-base-200/30 rounded">
+                        <span>Sillas</span>
+                        <div class="badge badge-success badge-xs">15</div>
+                    </div>
+                    <div class="flex justify-between p-2 bg-base-200/30 rounded">
+                        <span>Pizarras</span>
+                        <div class="badge badge-ghost badge-xs">No</div>
+                    </div>
+                    <div class="flex justify-between p-2 bg-base-200/30 rounded">
+                        <span>Atriles</span>
+                        <div class="badge badge-ghost badge-xs">No</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Servicios -->
+            <div>
+                <h3 class="text-sm font-medium text-base-content/80 mb-2 flex items-center gap-2">
+                    <i class="fas fa-concierge-bell text-accent text-xs"></i>
+                    Servicios Adicionales
+                </h3>
+                <div class="space-y-2">
+                    <div class="alert alert-info/50 py-2">
+                        <i class="fas fa-coffee"></i>
+                        <div class="flex-1">
+                            <span class="font-medium text-sm">Catering</span>
+                            <div class="text-xs text-base-content/70">Coffee break, agua, pastelería</div>
+                        </div>
+                        <div class="badge badge-info">15 personas</div>
+                    </div>
+                    <div class="alert alert-info py-2">
+                        <i class="fas fa-users"></i>
+                        <div class="flex-1">
+                            <span class="font-medium text-sm">Personal de Apoyo</span>
+                            <div class="text-xs text-base-content/70">Asistente técnico, moderador</div>
+                        </div>
+                        <div class="badge badge-info">Solicitado</div>
+                    </div>
+                    <div class="alert alert-warning py-2">
+                        <i class="fas fa-shield-alt"></i>
+                        <div class="flex-1">
+                            <span class="font-medium text-sm">Nivel de Seguridad</span>
+                        </div>
+                        <div class="badge badge-warning">Alto</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+    {% endif %}
+
+
 
     <!-- Botones de Acción -->
     <div class="flex gap-2 pt-2">
