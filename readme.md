@@ -133,7 +133,9 @@ Reservas_app/
    ```bash
    python manage.py createsuperuser
    ```
-8. **Por defecto, los usuarios creados son usuarios normales. para darle permisos al usuario, se debe ir al panel administrativo y darle permisos al usuario. (cambiar de grupo) **
+8. **Por defecto, los usuarios creados son usuarios normales. para darle permisos al usuario, se debe ir al panel administrativo y darle permisos al usuario. (cambiar de grupo)**
+   
+9. **IMPORTANTE**: Es necesario que el archivo .env se encuentre en la raiz del proyecto, con las configuraciones adecuadas para Poder correr el proyecto 
 
 ## Uso y Comandos Personalizados
 
