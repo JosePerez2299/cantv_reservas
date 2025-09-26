@@ -13,6 +13,7 @@ register = template.Library()
 def get_icon(icon_name):
 
     dict_icons = {
+        'reportes': 'fas fa-chart-line',
         'listado': 'fas fa-list-alt',
         'calendario': 'fas fa-calendar-alt',
         'reserva': 'fas fa-calendar-alt',
@@ -182,9 +183,9 @@ def get_td_html(context, obj, field):
         elif field == "espacios":
             relacionados = obj.espacios.all()
             if relacionados.exists():
-                max_length = 8
+                max_length = 12  # Aumentamos la longitud máxima
                 items = "".join(
-                    f"<span class='badge badge-sm badge-outline mr-1 mb-1' title='{e.nombre}'>"
+                    f"<span class='badge badge-sm badge-outline mr-1 mb-1 text-xs whitespace-nowrap overflow-hidden text-ellipsis max-w-24' title='{e.nombre}'>"
                     f"{e.nombre[:max_length]}{'...' if len(e.nombre) > max_length else ''}"
                     f"</span>" 
                     for e in relacionados[:3]  # Máximo 3 elementos
@@ -193,9 +194,9 @@ def get_td_html(context, obj, field):
                 extra = relacionados.count() - 3
                 if extra > 0:
                     items += f"<span class='badge badge-sm badge-ghost'>+{extra}</span>"
-                return mark_safe(f"<div class='flex flex-wrap'>{items}</div>")
+                return mark_safe(f"<div class='w-full min-w-0'><div class='flex flex-wrap gap-1 items-center'>{items}</div></div>")
             else:
-                return format_html("<span class='opacity-50 text-sm'>Sin espacios</span>")
+                return format_html("<div class='w-full'><span class='opacity-50 text-sm'>Sin espacios</span></div>")
         # Caso Espacio
     if isinstance(obj, Espacio):
         if field == "nombre":

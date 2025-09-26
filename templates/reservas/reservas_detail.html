@@ -1,99 +1,331 @@
-<div class="reserva-detail space-y-6">
-    <h3 class="text-2xl font-bold mb-6">Detalles de la Reserva #{{ object.id }}</h3>
-    
-    <!-- Información de la Reserva -->
-    <div class="bg-white p-4 rounded-lg shadow">
-        <h4 class="text-lg font-semibold mb-3 border-b pb-2">Información de la Reserva</h4>
-        <ul class="list-disc pl-5 space-y-2">
-            <li><strong>ID:</strong> {{ object.id }}</li>
-            <li><strong>Estado:</strong> <span class="font-medium">{{ object.estado }}</span></li>
-            {% if object.fecha_creacion %}
-            <li><strong>Fecha de Creación:</strong> {{ object.fecha_creacion|date:"d/m/Y H:i" }}</li>
-            {% endif %}
-            {% if object.fecha_aprobacion %}
-            <li><strong>Fecha de Aprobación:</strong> {{ object.fecha_aprobacion|date:"d/m/Y H:i" }}</li>
-            {% endif %}
-            {% if object.aprobado_por %}
-            <li><strong>Aprobado por:</strong> {{ object.aprobado_por }}</li>
-            {% endif %}
+{% load utils %}
+<div class="reserva-detail space-y-6 w-4xl">
+    <div class="flex justify-between">
+        {% include 'includes/form_header.html' with subtitle="Informacion de la Reserva" %}
 
-            {% if object.mensaje_aprobar_rechazar %}
-            <li><strong>Mensaje de Aprobación/Rechazo:</strong> {{ object.mensaje_aprobar_rechazar }}</li>
-            {% endif %}
-        </ul>
-    </div>
-
-    <!-- Información del Solicitante -->
-    <div class="bg-white p-4 rounded-lg shadow">
-        <h4 class="text-lg font-semibold mb-3 border-b pb-2">Información del Solicitante</h4>
-        <ul class="list-disc pl-5 space-y-2">
-            <li><strong>P00:</strong> {{ object.p00_solicitante }}</li>
-            <li><strong>Nombre:</strong> {{ object.nombre_solicitante }}</li>
-            <li><strong>Email:</strong> {{ object.email_solicitante }}</li>
-            <li><strong>Teléfono:</strong> {{ object.telefono_solicitante }}</li>
-            <li><strong>Vicepresidencia:</strong> {{ object.vicepresidencia_solicitante }}</li>
-            <li><strong>Gerencia:</strong> {{ object.gerencia_solicitante }}</li>
-        </ul>
-    </div>
-
-    <!-- Detalles de la Actividad -->
-    <div class="bg-white p-4 rounded-lg shadow">
-        <h4 class="text-lg font-semibold mb-3 border-b pb-2">Detalles de la Actividad</h4>
-        <ul class="list-disc pl-5 space-y-2">
-            <li><strong>Modalidad:</strong> {{ object.modalidad }}</li>
-            <li><strong>Tipo de Solicitud:</strong> {{ object.tipo_solicitud }}</li>
-            <li><strong>Tipo de Actividad:</strong> {{ object.tipo_actividad }}</li>
-            <li><strong>Motivo:</strong> {{ object.motivo }}</li>
-            {% if object.requerimientos %}
-            <li class="mt-2">
-                <strong>Requerimientos:</strong> 
-                <div class="mt-1 p-2 bg-gray-50 rounded">
-                    <pre class="text-sm">{{ object.requerimientos|pprint }}</pre>
-                </div>
-            </li>
-            {% endif %}
-        </ul>
-    </div>
-
-    <!-- Fechas y Horarios -->
-    <div class="bg-white p-4 rounded-lg shadow">
-        <h4 class="text-lg font-semibold mb-3 border-b pb-2">Fechas y Horarios</h4>
-        <ul class="list-disc pl-5 space-y-2">
-            <li><strong>Fecha de Uso:</strong> {{ object.fecha_uso|date:"d/m/Y" }}</li>
-            <li><strong>Hora de Inicio:</strong> {{ object.hora_inicio|time:"H:i" }}</li>
-            <li><strong>Hora de Fin:</strong> {{ object.hora_fin|time:"H:i" }}</li>
-        </ul>
-    </div>
-
-    <!-- Espacios Asignados -->
-    <div class="bg-white p-4 rounded-lg shadow">
-        <h4 class="text-lg font-semibold mb-3 border-b pb-2">Espacios Asignados</h4>
-        {% if object.reserva_espacios.all %}
-            <ul class="list-disc pl-5 space-y-3">
-                {% for reserva_espacio in object.reserva_espacios.all %}
-                    <li class="bg-gray-50 p-3 rounded">
-                        <div class="font-medium">{{ reserva_espacio.espacio.nombre }}</div>
-                        {% if reserva_espacio.espacio.tipo %}
-                            <div class="text-sm text-gray-600">Tipo: {{ reserva_espacio.espacio.get_tipo_display }}</div>
-                        {% endif %}
-                        {% if reserva_espacio.numero_participantes %}
-                            <div class="text-sm text-gray-600">Participantes: {{ reserva_espacio.numero_participantes }}</div>
-                        {% endif %}
-                    </li>
-                {% endfor %}
-            </ul>
-        {% else %}
-            <p class="text-gray-500 italic">No hay espacios asignados</p>
-        {% endif %}
-    </div>
-
-    <!-- Información Adicional -->
-    {% if object.observacion %}
-    <div class="bg-white p-4 rounded-lg shadow">
-        <h4 class="text-lg font-semibold mb-3 border-b pb-2">Información Adicional</h4>
-        <div class="p-3 bg-gray-50 rounded">
-            <p class="whitespace-pre-line">{{ object.observacion }}</p>
+        <div class="mr-6">
+            {% get_td_html reserva 'estado'%}
         </div>
     </div>
-    {% endif %}
+    <div class="divider"></div>
+    <!-- Información del Solicitante -->
+    <div class="card bg-base-100 shadow-sm border border-base-200 p-4">
+        <h2 class="text-base font-medium mb-3 flex items-center gap-2">
+            <i class="fas fa-user text-info"></i>
+            Información del Solicitante
+        </h2>
+        <div class="grid grid-cols-2 gap-x-6 gap-y-2 text-sm">
+            <div class="flex justify-between">
+                <span class="text-base-content/60">P00:</span>
+                <span class="font-medium">{{ reserva.p00_solicitante }}</span>
+            </div>
+            <div class="flex justify-between">
+                <span class="text-base-content/60">Teléfono:</span>
+                <span class="font-medium">{{ reserva.telefono_solicitante }}</span>
+            </div>
+            <div class="flex justify-between">
+                <span class="text-base-content/60">Nombre:</span>
+                <span class="font-medium">{{ reserva.nombre_solicitante }}</span>
+            </div>
+            <div class="flex justify-between ">
+                <span class="text-base-content/60">Email:</span>
+                <span class="font-medium">{{ reserva.email_solicitante }}</span>
+            </div>
+            <div class="flex justify-between">
+                <span class="text-base-content/60">Vicepresidencia:</span>
+                <span class="font-medium">{{ reserva.vicepresidencia_solicitante }}</span>
+            </div>
+            <div></div>
+            <div class="flex justify-between">
+                <span class="text-base-content/60">Gerencia:</span>
+                <span class="font-medium">{{ reserva.gerencia_solicitante }}</span>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Programación y Actividad -->
+    <div class="grid grid-cols-2 gap-4">
+        <div class="card bg-base-100 shadow-sm border border-base-200 p-4">
+            <h2 class="text-base font-medium mb-3 flex items-center gap-2">
+                <i class="fas fa-calendar-alt text-primary"></i>
+                Programación
+            </h2>
+            <div class="space-y-2 text-sm">
+                <div class="flex justify-between">
+                    <span class="text-base-content/60">Fecha:</span>
+                    <span class="font-medium">{{ reserva.fecha_uso }}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-base-content/60">Horario:</span>
+                    <span class="font-medium">{{ reserva.hora_inicio|time:"g:i A" }} - {{ reserva.hora_fin|time:"g:i A"}}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-base-content/60">Duración:</span>
+                    <span class="font-medium">{{ reserva.duracion }}</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="card bg-base-100 shadow-sm border border-base-200 p-4">
+            <h2 class="text-base font-medium mb-3 flex items-center gap-2">
+                <i class="fas fa-tasks text-secondary"></i>
+                Actividad
+            </h2>
+            <div class="space-y-2 text-sm">
+                <div class="flex justify-between">
+                    <span class="text-base-content/60">Modalidad:</span>
+                    <span class="font-medium">{{ reserva.get_modalidad_display }}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-base-content/60">Tipo:</span>
+                    <span class="font-medium">{{ reserva.get_tipo_solicitud_display }}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-base-content/60">Actividad:</span>
+                    <span class="font-medium">{{ reserva.tipo_actividad }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Motivo -->
+    <div class="card bg-base-100 shadow-sm border border-base-200 p-4">
+        <h2 class="text-base font-medium mb-2 flex items-center gap-2">
+            <i class="fas fa-comment-dots text-accent"></i>
+            Motivo
+        </h2>
+        <div class="p-3 bg-base-200/50 rounded-lg">
+            <p class="text-sm">{{ reserva.motivo }}</p>
+        </div>
+    </div>
+
+    <!-- Espacios Reservados -->
+    <div class="card bg-base-100 shadow-sm border border-base-200 p-4">
+        <h2 class="text-base font-medium mb-3 flex items-center gap-2">
+            <i class="fas fa-building text-warning"></i>
+            Espacios Reservados
+        </h2>
+        <div class="space-y-2">
+            <div class=" text-sm p-2 space-y-4 bg-base-200/30 rounded">
+
+                {% for espacio in reserva.espacios.all %}
+                <div class="flex justify-between bg-base-300 py-6 px-4  rounded">
+                    <span class="font-medium">{{ espacio.nombre }}</span>
+                    <div class="flex items-center gap-2">
+                        <div class="badge badge-primary badge-sm">{{ espacio.get_tipo_display }}</div>
+                        <span class="badge badge-info badge-sm"> Cap. {{ espacio.capacidad_maxima }} personas</span>
+                        {% if espacio.tipo == 'fisico' %}
+                        <span class="badge badge-secondary badge-sm"> {{ espacio.detalle_fisico.ubicacion }}</span>
+                        {% endif %}
+
+                        {% if espacio.tipo == 'digital' %}
+                        <span class="badge badge-secondary badge-sm"> {{ espacio.detalle_digital.plataforma }}</span>
+                        <a href="{{ espacio.detalle_digital.url|default_if_none:"#" }}" class="badge badge-neutral badge-sm"> {{ espacio.detalle_digital.url|default_if_none:"URL no disponible"|truncatechars:20}}</a>
+
+
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    {% if reserva.modalidad == 'presencial' or reserva.modalidad == 'mixta' %}
+    <!-- Requerimientos -->
+    <div class="card bg-base-100 shadow-sm border border-base-200 p-4">
+        <h2 class="text-base font-medium mb-3 flex items-center gap-2">
+            <i class="fas fa-cogs text-info"></i>
+            Requerimientos
+        </h2>
+
+        <!-- Técnicos -->
+        <div class="mb-4">
+            <h3 class="text-sm font-medium text-base-content/80 mb-2 flex items-center gap-2">
+                <i class="fas fa-laptop text-primary text-xs"></i>
+                Técnicos
+            </h3>
+            <div class="grid grid-cols-3 gap-2 text-xs">
+                <div class="flex justify-between p-2 bg-base-200/30 rounded">
+                    <span>Proyector</span>
+                    <div class="badge badge-success badge-xs">2</div>
+                </div>
+                <div class="flex justify-between p-2 bg-base-200/30 rounded">
+                    <span>Pantallas</span>
+                    <div class="badge badge-success badge-xs">1</div>
+                </div>
+                <div class="flex justify-between p-2 bg-base-200/30 rounded">
+                    <span>Sonido</span>
+                    <div class="badge badge-success badge-xs">Sí</div>
+                </div>
+                <div class="flex justify-between p-2 bg-base-200/30 rounded">
+                    <span>WiFi</span>
+                    <div class="badge badge-success badge-xs">Sí</div>
+                </div>
+                <div class="flex justify-between p-2 bg-base-200/30 rounded">
+                    <span>Micrófono</span>
+                    <div class="badge badge-ghost badge-xs">No</div>
+                </div>
+                <div class="flex justify-between p-2 bg-base-200/30 rounded">
+                    <span>Computadoras</span>
+                    <div class="badge badge-ghost badge-xs">No</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Materiales -->
+        <div class="mb-4">
+            <h3 class="text-sm font-medium text-base-content/80 mb-2 flex items-center gap-2">
+                <i class="fas fa-chair text-secondary text-xs"></i>
+                Materiales
+            </h3>
+            <div class="grid grid-cols-4 gap-2 text-xs">
+                <div class="flex justify-between p-2 bg-base-200/30 rounded">
+                    <span>Mesas</span>
+                    <div class="badge badge-success badge-xs">3</div>
+                </div>
+                <div class="flex justify-between p-2 bg-base-200/30 rounded">
+                    <span>Sillas</span>
+                    <div class="badge badge-success badge-xs">15</div>
+                </div>
+                <div class="flex justify-between p-2 bg-base-200/30 rounded">
+                    <span>Pizarras</span>
+                    <div class="badge badge-ghost badge-xs">No</div>
+                </div>
+                <div class="flex justify-between p-2 bg-base-200/30 rounded">
+                    <span>Atriles</span>
+                    <div class="badge badge-ghost badge-xs">No</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Servicios -->
+        <div>
+            <h3 class="text-sm font-medium text-base-content/80 mb-2 flex items-center gap-2">
+                <i class="fas fa-concierge-bell text-accent text-xs"></i>
+                Servicios Adicionales
+            </h3>
+            <div class="space-y-2">
+                <div class="alert alert-info/50 py-2">
+                    <i class="fas fa-coffee"></i>
+                    <div class="flex-1">
+                        <span class="font-medium text-sm">Catering</span>
+                        <div class="text-xs text-base-content/70">Coffee break, agua, pastelería</div>
+                    </div>
+                    <div class="badge badge-info">15 personas</div>
+                </div>
+                <div class="alert alert-info py-2">
+                    <i class="fas fa-users"></i>
+                    <div class="flex-1">
+                        <span class="font-medium text-sm">Personal de Apoyo</span>
+                        <div class="text-xs text-base-content/70">Asistente técnico, moderador</div>
+                    </div>
+                    <div class="badge badge-info">Solicitado</div>
+                </div>
+                <div class="alert alert-warning py-2">
+                    <i class="fas fa-shield-alt"></i>
+                    <div class="flex-1">
+                        <span class="font-medium text-sm">Nivel de Seguridad</span>
+                    </div>
+                    <div class="badge badge-warning">Alto</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% endif %} 
+
+    {% if reserva.modalidad == 'virtual' or reserva.modalidad == 'mixta' %}
+
+    <div>
+        Todo
+    </div>
+
+    {% endif %} 
+    <!-- Estado y Observaciones -->
+    <div class="grid grid-cols-2 gap-4">
+        <div class="card bg-base-100 shadow-sm border border-base-200  space-y-2 p-4">
+            <h2 class="text-base font-medium mb-3 flex items-center gap-2">
+                <i class="fas fa-history text-success"></i>
+                Estado
+            </h2>
+            <div class="space-y-2 text-sm">
+                <div class="flex justify-between">
+                    <span class="text-base-content/60">Creado:</span>
+                    <span class="font-medium">{{ reserva.fecha_creacion}}</span>
+                </div>
+
+                {% if reserva.estado != Reserva.Estado.PENDIENTE %}
+                    {% if reserva.fecha_cambio_estado != None %}
+                    <div class="flex justify-between">
+                        <span class="text-base-content/60">Gestionado:</span>
+                        <span class="font-medium">{{ reserva.fecha_cambio_estado}}</span>
+                    </div>
+                    {% endif %}
+
+                    {% if reserva.aprobado_por != None %}
+                    <div class="flex justify-between">
+                        <span class="text-base-content/60">Gestionado por:</span>
+                        <span class="font-medium">{{ reserva.aprobado_por}}</span>
+                    </div>
+                    {% endif %}
+                {% endif %}
+            </div>
+            <div class="flex justify-between">
+                <span class="text-base-content/60">Estado:</span>
+                <span class="font-medium">{% get_td_html reserva 'estado' %}</span>
+            </div>
+        </div>
+
+        <div class="card bg-base-100 shadow-sm border border-base-200 p-4">
+            <h2 class="text-base font-medium mb-3 flex items-center gap-2">
+                <i class="fas fa-sticky-note text-warning"></i>
+                Observaciones
+            </h2>
+            <div class="p-3 bg-base-200/30 rounded-lg text-xs leading-relaxed">
+                <p class="mb-2">{{ reserva.observaciones|default:"N/A" }}</p>
+            </div>
+        </div>
+
+        {% if reserva.estado != Reserva.Estado.PENDIENTE and reserva.mensaje_aprobar_rechazar != None %}
+        <div class="col-span-2 card bg-base-100 shadow-sm border border-base-200 p-4">
+            <h2 class="text-base font-medium mb-3 flex items-center gap-2">
+                <i class="fas fa-sticky-note text-warning"></i>
+                Mensaje de Gestion
+            </h2>
+            <div class="p-3 bg-base-200/30 rounded-lg text-xs leading-relaxed">
+                <p class="mb-2">{{ reserva.mensaje_aprobar_rechazar|default:"N/A" }}</p>
+            </div>
+        </div>
+        {% endif %}
+
+    </div>
+
+    <!-- Botones de Acción -->
+    <div class="flex gap-2 pt-2">
+        {% if reserva.estado == 'pendiente' %}
+
+            {% if request.user.is_admin %}
+            <button class="flex-1 btn btn-outline btn-success btn-sm gap-2" onclick="closeModal(); openModal('{% url 'reserva_approve' reserva.id %}')">
+                <i class="fas fa-check"></i>
+                Gestionar
+            </button>
+            {% endif %}
+
+            <button class="flex-1 btn btn-outline btn-sm gap-2" onclick="closeModal(); openModal('{% url 'reserva_edit' reserva.id %}')">
+                <i class="fas fa-edit"></i>
+                Editar
+            </button>
+        {% endif %}
+
+        <button class="flex-1 items-center btn btn-outline btn-error btn-sm gap-2" onclick="closeModal()">
+            <i class="fas fa-times"></i>
+            Cerrar 
+        </button>
+        <button class="flex-1 items-center btn btn-outline btn-warning btn-sm gap-2" onclick="alert('Aun no esta implementado.')">
+            <i class="fas fa-print"></i>
+            Imprimir
+        </button>
+    </div>
 </div>

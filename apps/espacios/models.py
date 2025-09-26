@@ -13,7 +13,7 @@ class Espacio(models.Model):
         FISICO = 'fisico', 'Físico'
         DIGITAL = 'digital', 'Digital'
 
-    nombre = models.CharField(max_length=20, unique=True, blank=False,
+    nombre = models.CharField(max_length=150, unique=True, blank=False,
                               validators=[
                                   RegexValidator(
                                       r"^[a-zA-Z][a-zA-Z0-9 ]*",

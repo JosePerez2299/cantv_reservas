@@ -10,7 +10,7 @@ from .filters import LogFilter
 from library.mixins.helpers import ListCrudMixin, SmartOrderingMixin
 from django_filters.views import FilterView
 
-class LogListView(LoginRequiredMixin, PermissionRequiredMixin, ListCrudMixin,  SmartOrderingMixin, FilterView ):
+class LogListView(LoginRequiredMixin, PermissionRequiredMixin, ListCrudMixin, FilterView ):
     """
     Muestra una lista de logs con un formulario de filtrado
     """

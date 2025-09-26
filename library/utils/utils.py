@@ -37,6 +37,7 @@ from django.db.models import Q, Count
 def get_stats(request):
     """Punto de entrada principal para obtener estadísticas según el tipo de usuario"""
     try:
+        # Obtener últimos 5 logs
         logs = get_logs(request.user)[:5]
     except:
         logs = []
@@ -213,6 +214,8 @@ def get_stats_usuario(request):
 
 
 def get_logs(user):
+
+    # TO DO: Actualizar query. Ya el grupo moderador no existe
     qs = LogEntry.objects.all()
     ct_reserva = ContentType.objects.get_for_model(Reserva)
 

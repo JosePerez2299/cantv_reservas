@@ -26,12 +26,8 @@ from django.db.models import Q, Count
 from django.http import JsonResponse
 from datetime import datetime
 from django.views import View
+from django.utils import timezone
 from django.views.generic import TemplateView
-from django.http import Http404, HttpResponse
-from django.core.exceptions import ValidationError
-from django.shortcuts import render, redirect
-from django.db import transaction
-import time 
 from .services import *
 from django.shortcuts import get_object_or_404
 def qs_condiciones(user):
@@ -63,13 +59,12 @@ class ReservasMonthlyCount(LoginRequiredMixin, PermissionRequiredMixin,View):
         except (ValueError, TypeError):
             return JsonResponse({'error': 'Formato de fecha invalido'}, status=400)
 
-        condiciones = qs_condiciones(self.request.user)
-        queryset = Reserva.objects.filter(
-            condiciones,
+        reservas_por_usuario = lista_reservas_usuario(self.request.user)
+        queryset = reservas_por_usuario.filter(
             fecha_uso__gte=start_date,
             fecha_uso__lte=end_date,
         )
-        
+
 
         possible_states = ['pendiente', 'aprobada', 'rechazada']
 
@@ -418,17 +413,22 @@ class ReservaUpdateWizardView(LoginRequiredMixin, PermissionRequiredMixin, Sessi
 
     form_list = [
         ('reserva', ReservaUpdateForm),
+        ('detalle_digital', DetalleReservaDigitalForm),
         ('requerimiento', RequerimientoForm),
 
     ]
 
     condition_dict = {
         'requerimiento': es_presencial_o_mixta,
+        'detalle_digital': es_virtual_o_mixta,
     }
 
     def dispatch(self, request, *args, **kwargs):
         # Carga la instancia que vamos a editar (pk en la URL)
         self.reserva = get_object_or_404(Reserva, pk=kwargs.get('pk'))
+
+        if self.reserva.estado != 'pendiente':
+            raise Http404
         return super().dispatch(request, *args, **kwargs)
 
 
@@ -455,6 +455,7 @@ class ReservaUpdateWizardView(LoginRequiredMixin, PermissionRequiredMixin, Sessi
     def get_template_names(self):
         TEMPLATES = {
             "reserva": "reservas/reservas_edit.html",
+            'detalle_digital': 'reservas/detalles_digitales_form.html',
             "requerimiento": "reservas/requerimiento_form.html",
         }
         return [TEMPLATES[self.steps.current]]
@@ -477,44 +478,13 @@ class ReservaUpdateWizardView(LoginRequiredMixin, PermissionRequiredMixin, Sessi
             # En caso de error, la transacción se revierte automáticamente
             return HttpResponse(f'Error al guardar: {str(e)}', status=500)
 
-class ReservaUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
-    """
-    Edita una reserva existente
-    """
-    model = Reserva
-    form_class = ReservaUpdateForm
-    template_name = 'reservas/reservas_edit.html'
-    success_url = reverse_lazy('reserva')
-    permission_required = 'reservas.change_reserva'
-
-    def success_message(self):
-        return 'Reserva editada correctamente'
-
-    def get_context_data(self, **kwargs):
-        ctx = super().get_context_data(**kwargs)
-        ctx['url'] = reverse_lazy('reserva_edit', args=[self.object.pk])
-        ctx['title'] = 'Editar Reserva'
-        ctx['subtitle'] = 'Actualiza los datos de la reserva'
-        ctx['modalidad'] = self.object.modalidad
-        return ctx
-
-    def form_valid(self, form):
-        response = super().form_valid(form)
-        # Si es una petición HTMX, retornar 204 y disparar un trigger para mensajes
-        if self.request.headers.get('HX-Request'):
-            resp = HttpResponse(status=204)
-            resp['HX-Trigger'] = json.dumps({'showMessage': self.success_message()})
-            return resp
-        return response
-
-    def get_queryset(self):
-        return lista_reservas_usuario(self.request.user)
-        
+    
 class ReservaDetailView(LoginRequiredMixin, PermissionRequiredMixin,  FormContextMixin, DetailView):
     """
     Muestra los detalles de una reserva
     """
     model = Reserva
+    object_context_name = 'reserva'
     template_name = 'reservas/reservas_detail.html'
     permission_required = 'reservas.view_reserva'
     html_title = 'Detalles de Reserva'
@@ -551,9 +521,8 @@ class ReservaDeleteView(LoginRequiredMixin, PermissionRequiredMixin, AjaxDeleteM
     ]
 
     def get_queryset(self):
-        qs = super().get_queryset()
-        condiciones = qs_condiciones(self.request.user)
-        qs = qs.filter(condiciones & Q(estado='pendiente'))
+        reservas_por_usuario = lista_reservas_usuario(self.request.user)
+        qs = reservas_por_usuario.filter(Q(estado='pendiente'))
         return qs
 
 class ReservaApproveView(LoginRequiredMixin, PermissionRequiredMixin, AjaxFormMixin, UpdateView):
@@ -579,7 +548,6 @@ class ReservaApproveView(LoginRequiredMixin, PermissionRequiredMixin, AjaxFormMi
     def get_queryset(self):
         if not self.request.user.is_admin:
             raise Http404
-
         qs = super().get_queryset()
         qs = qs.filter(Q(estado='pendiente'))
         return qs
@@ -587,5 +555,6 @@ class ReservaApproveView(LoginRequiredMixin, PermissionRequiredMixin, AjaxFormMi
     def form_valid(self, form):
         # Registrar el usuario que aprobo la reserva
         form.instance.aprobado_por = self.request.user
+        # Registrar la fecha y hora del cambio de estado en el servidor
+        form.instance.fecha_cambio_estado = timezone.now()
         return super().form_valid(form)
-        
